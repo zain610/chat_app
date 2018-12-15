@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{%block title%}
+Channel list
+{%endblock%}
+
+{% block script %}
+<script src="{{ url_for('static', filename='channels.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <ul>
+        Channel Lists
+        {%for channel in data%}
+        <li>{{channel}}</li>
+        {% endfor%}
+    </ul>
+</div>
+<div id='result'></div>
+<form id='channelAddForm'>
+    <input type="text" id="channelsAddName" name='channelsAddName' placeholder="New Channel name">
+    <button id="channelsActionFormBtn" class='btn btn-primary' type="submit">Add Channel</button>
+</form>
+<br>
+
+{%endblock%}
