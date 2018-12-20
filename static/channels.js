@@ -5,15 +5,6 @@ document.addEventListener('DOMContentLoaded', () =>{
     // }
 
     // 
-    // var socket = io.connect(location.protocol + '//' + document.domain + ':'+ location.port)
-    // socket.on('connect', () =>{
-    //     console.log('connected')
-    //     socket.emit('join', ()=>{
-
-    //     })
-
-    // }
-
 
     form.addEventListener('submit', ()=>{
         const name = form.querySelector('#channelsAddName').value
