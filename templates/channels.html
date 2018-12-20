@@ -4,23 +4,40 @@ Channel list
 {%endblock%}
 
 {% block script %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
 <script src="{{ url_for('static', filename='channels.js') }}"></script>
 {% endblock %}
 
 {% block body %}
 <div class="container">
-    <ul>
-        Channel Lists
-        {%for channel in data%}
-        <li>{{channel}}</li>
-        {% endfor%}
-    </ul>
-</div>
-<div id='result'></div>
-<form id='channelAddForm'>
-    <input type="text" id="channelsAddName" name='channelsAddName' placeholder="New Channel name">
-    <button id="channelsActionFormBtn" class='btn btn-primary' type="submit">Add Channel</button>
-</form>
-<br>
-
-{%endblock%}
+    <div class="row">
+        <div class="col-md">
+            <table>
+                <th>
+                    Channel Lists
+                </th>
+                
+                {%for channel in data%}
+                <tr>
+                    <td>{{channel}}</td>
+                    <td><a role="button" class="btn btn-primary" onclick="enterChannel('{{channel}}')">Enter!</a></td>
+                </tr>
+                {% endfor%}
+                
+            </table>
+            <br>
+        </div>
+        <div class="col-md">
+            <div id='result'></div>
+            <form id='channelAddForm'>
+                <input type="text" id="channelsAddName" name='channelsAddName' placeholder="New Channel name">
+                <button id="channelsActionFormBtn" class='btn btn-primary' type="submit">Add Channel</button>
+            </form>
+            <br>
+        </div> 
+    </div>
+    
+    
+    
+    
+    {%endblock%}

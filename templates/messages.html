@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{%block script %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', ()=>{
+        const username = localStorage.getItem('display_name')
+        const channel = localStorage.getItem('channel')
+        if(channel) {
+            document.getElementById('channelName').innerHTML = channel
+        }
+        var data = {
+            'username': username,
+            'channel': channel
+        }
+        console.log(name)
+        var socket = io.connect(location.protocol + '//' + document.domain + ':'+ location.port)
+        socket.on('connect', () =>{
+            console.log('connected')
+            socket.emit('join', data)
+            
+
+
+            document.getElementById('messageInputBtn').onclick = () => {
+                const message = document.getElementById('messageInput').value;
+                console.log(message)
+                data['message'] = message
+                console.log(data)
+                socket.emit('submit message', data)        
+            };
+        });
+        socket.on('test', data=>{
+            const li = document.createElement('li');
+            li.innerHTML = `${data.username} has joined the room: ${data.room}`
+            document.querySelector('#messages').append(li)
+        });
+
+        socket.on('announce message', data=>{
+            const li = document.createElement('li');
+            li.innerHTML = `Message recorded: ${data.message} by ${data.username}`;
+            document.querySelector('#messages').append(li)
+        })
+
+    });
+    function userLogout(){
+        localStorage.clear()
+        location.href = '/'
+    }
+</script>
+{%endblock%}
+{% block body%}
+<div class="container">
+    <div class="row">
+        <div class="col-md">
+            <h1>Welcome to channel <span id='channelName'></span></h1>
+            <ul id='messages'></ul>
+            <input placeholder="Input message here" id='messageInput'>
+            <button class="btn btn-primary" id='messageInputBtn'>submit</button>
+        </div>
+        <div class="col-md">
+            <h3>User List</h3>
+        </div>
+    </div>
+</div>
+
+<form action="{{url_for('index')}}" method="POST">
+    <button onclick="userLogout()" class="btn btn-primary">Logout</button>
+</form>
+{%endblock%}
+
+
+
+

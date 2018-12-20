@@ -1,5 +1,20 @@
 document.addEventListener('DOMContentLoaded', () =>{
     const form = document.getElementById('channelAddForm')
+    // if(localStorage.getItem('channel')) {
+    //     location.href = '../messages/' + localStorage.getItem('channel')
+    // }
+
+    // 
+    // var socket = io.connect(location.protocol + '//' + document.domain + ':'+ location.port)
+    // socket.on('connect', () =>{
+    //     console.log('connected')
+    //     socket.emit('join', ()=>{
+
+    //     })
+
+    // }
+
+
     form.addEventListener('submit', ()=>{
         const name = form.querySelector('#channelsAddName').value
         const request = new XMLHttpRequest();
@@ -11,11 +26,11 @@ document.addEventListener('DOMContentLoaded', () =>{
             console.log(data)
             if(data.success){
                 const contents = "successfully added channel to list";
-                document.getElementById('result').innerHTML = contents
+                alert(contents)
             }
             else{
                 const contents = "there was an error, please try again!"
-                document.getElementById('result').innerHTML = contents;
+                alert(contents)
             }
             location.reload()
         }
@@ -27,3 +42,8 @@ document.addEventListener('DOMContentLoaded', () =>{
         return false;
     })
 })
+function enterChannel(name) {
+    console.log(name)
+    localStorage.setItem('channel', name)
+    window.location.href = '../messages/'+ name
+}
