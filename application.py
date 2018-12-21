@@ -11,8 +11,8 @@ Session(app)
 socketio = SocketIO(app, manage_session=False)
 
 channel_list = ["anthony"]
-user_list = []
 server_data = []
+user_list = []
 
 @app.route("/", methods=["POST", "GET"])
 def index():
@@ -37,7 +37,8 @@ def channels(action):
 
     if action == "add":
         channel_name = request.form.get("name")
-        print("channel name", channel_name)
+        username = request.form.get('username')
+        print("channel name", channel_name, 'username', username)
         if(channel_name is not None and (channel_name not in channel_list)):
             channel_list.append(channel_name)
             session['channels'] = channel_list
@@ -51,21 +52,24 @@ def messages(channel):
 
 @socketio.on('join')
 def on_join(data):
+    
     username = data['username']
     print(user_list)
+    user_list.append(username)
     room = data['channel']
-    session[room].append(username)
+    session[room] = user_list
     join_room(room)
-    dataset={'username': username, 'room': room}
-    emit('test', dataset, broadcast=True)
+    dataset={'username': username, 'room': room, 'user_list': session[room]}
+    emit('join', dataset, broadcast=True)
     
 
-@socketio.on('leave')
-def on_leave(data):
-    username = data['username']
-    channel = data['channel']
-    leave_room(channel)
-    send(username + ' has left the room.', room=channel)
+# @socketio.on('leave')
+# def on_leave(data):
+#     username = data['username']
+#     channel = data['channel']
+#     leave_room(channel)
+#     session[room].pop()
+#     dataset = {'username': username, 'room': room}
 
 @socketio.on('submit message')
 def message(data):

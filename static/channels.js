@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () =>{
     // if(localStorage.getItem('channel')) {
     //     location.href = '../messages/' + localStorage.getItem('channel')
     // }
+    const username = prompt('Please Enter a username')
 
     // 
 
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () =>{
         // Add data to send with request
         const data = new FormData();
         data.append('name', name );
+        data.append('username', username)
         // Send request
         request.send(data)
         return false;
