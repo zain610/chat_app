@@ -11,8 +11,12 @@ Session(app)
 socketio = SocketIO(app, manage_session=False)
 
 channel_list = ["anthony"]
+# data like message, channel name, user etcs
 server_data = []
+# total user list
 user_list = []
+# users in each room
+users = [] 
 
 @app.route("/", methods=["POST", "GET"])
 def index():
@@ -39,27 +43,36 @@ def channels(action):
         channel_name = request.form.get("name")
         username = request.form.get('username')
         print("channel name", channel_name, 'username', username)
-        if(channel_name is not None and (channel_name not in channel_list)):
+        if((channel_name and username) is not None and (channel_name not in channel_list) and (username not in user_list)):
+            # maybe create setters and getters for channels and users??
             channel_list.append(channel_name)
-            session['channels'] = channel_list
+            session['channel_list'] = channel_list
+            user_list.append(username)
+            session['user_list'] = user_list
             return jsonify({"success": True})
         return jsonify({"success": False})
     return render_template('channels.html', action="view", data=session.get('channels'))
-    
+
+
 @app.route('/messages/<channel>', methods=["POST", "GET"])
 def messages(channel):
-    return render_template('messages.html', channel=channel)
+    print('users in this room', users)
+    return render_template('messages.html')
 
 @socketio.on('join')
 def on_join(data):
     
-    username = data['username']
-    print(user_list)
-    user_list.append(username)
+    socketio.username = data['username']
+
+    print(socketio.username)
+    if socketio.username is not None:
+        users.append(socketio.username)
+    print('users in this room', users)
     room = data['channel']
+    print(user_list)
     session[room] = user_list
     join_room(room)
-    dataset={'username': username, 'room': room, 'user_list': session[room]}
+    dataset={'username': socketio.username, 'room': room, 'user_list': session[room]}
     emit('join', dataset, broadcast=True)
     
 

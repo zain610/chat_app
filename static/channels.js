@@ -1,14 +1,13 @@
+
 document.addEventListener('DOMContentLoaded', () =>{
+    if (localStorage.getItem('username') == null) {
+        const username = prompt('Please Enter a username')
+        localStorage.setItem('username', username)
+    }
+    
     const form = document.getElementById('channelAddForm')
-    // if(localStorage.getItem('channel')) {
-    //     location.href = '../messages/' + localStorage.getItem('channel')
-    // }
-    const username = prompt('Please Enter a username')
-
-    // 
-
     form.addEventListener('submit', ()=>{
-        const name = form.querySelector('#channelsAddName').value
+        const channel = form.querySelector('#channelsAddName').value
         const request = new XMLHttpRequest();
         request.open('POST', '/channels/add');
         //Callback function for when the request completes
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () =>{
         }
         // Add data to send with request
         const data = new FormData();
-        data.append('name', name );
+        data.append('channel', channel );
         data.append('username', username)
         // Send request
         request.send(data)
@@ -40,3 +39,6 @@ function enterChannel(name) {
     localStorage.setItem('channel', name)
     window.location.href = '../messages/'+ name
 }
+// function addUser(name){
+//     console.log(name)
+// }
