@@ -1,15 +1,36 @@
 
 document.addEventListener('DOMContentLoaded', () =>{
+    const request = new XMLHttpRequest();
+    request.open('POST', '/channels/add');
     if (localStorage.getItem('username') == null) {
         const username = prompt('Please Enter a username')
         localStorage.setItem('username', username)
+        request.onload = ()=>{
+            const data = JSON.parse(request.responseText)
+            console.log(data)
+            if(data.success){
+                alert('Successfully added users to userlist')
+            }
+            else{
+                alert('Failed to add user to userlist')
+            }
+
+        }
+        const user_data = new FormData();
+        user_data.append('username', username)
+        request.send(user_data);
+        return false
     }
     
     const form = document.getElementById('channelAddForm')
     form.addEventListener('submit', ()=>{
         const channel = form.querySelector('#channelsAddName').value
-        const request = new XMLHttpRequest();
-        request.open('POST', '/channels/add');
+        // Add data to send with request
+        const channel_data = new FormData();
+        channel_data.append('channel', channel );
+        // Send request
+        request.send(channel_data)
+        
         //Callback function for when the request completes
         request.onload = () =>{
             // get json data
@@ -22,16 +43,11 @@ document.addEventListener('DOMContentLoaded', () =>{
             else{
                 const contents = "there was an error, please try again!"
                 alert(contents)
-            }
-            location.reload()
-        }
-        // Add data to send with request
-        const data = new FormData();
-        data.append('channel', channel );
-        data.append('username', username)
-        // Send request
-        request.send(data)
+            }    
+        location.reload()
         return false;
+        }
+       
     })
 })
 function enterChannel(name) {
@@ -39,6 +55,3 @@ function enterChannel(name) {
     localStorage.setItem('channel', name)
     window.location.href = '../messages/'+ name
 }
-// function addUser(name){
-//     console.log(name)
-// }

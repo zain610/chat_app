@@ -9,15 +9,16 @@
         if(channel) {
             document.getElementById('channelName').innerHTML = channel
         }
-        var data = {
+/*        var data = {
             'username': username,
             'channel': channel
         }
+        */
         console.log(data)
         var socket = io.connect(location.protocol + '//' + document.domain + ':'+ location.port)
         socket.on('connect', () =>{
             console.log('connected')
-            socket.emit('join', data)
+            socket.emit('join_channel', data)
             
 
 
@@ -30,6 +31,7 @@
             };
         });
         socket.on('join', data=>{
+            console.log(dataset.user_list)
             const li = document.createElement('li');
             li.innerHTML = `${data.username} has joined the room: ${data.room}`
             document.querySelector('#messages').append(li)

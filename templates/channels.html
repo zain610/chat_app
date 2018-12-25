@@ -16,13 +16,16 @@ Channel list
                 <th>
                     Channel Lists
                 </th>
-                
-                {%for channel in data%}
+                {% if data['channels']%}
+                {%for channel in data['channels']%}
                 <tr>
                     <td>{{channel}}</td>
                     <td><a role="button" class="btn btn-primary" onclick="enterChannel('{{channel}}')">Enter!</a></td>
                 </tr>
-                {% endfor%}
+                {% endfor %}
+                {%else%}
+                <tr><td>No Channels Yet</td></tr>
+                {% endif %}
                 
             </table>
             <br>
