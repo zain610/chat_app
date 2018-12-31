@@ -1,16 +1,18 @@
 if(localStorage.getItem('username') && localStorage.getItem('channel')){
     document.addEventListener('DOMContentLoaded', () => {
         // get username and channel of user
+        let channel_list = []
         const username = localStorage.getItem('username');
         const channel = localStorage.getItem('channel');
+        let users = localStorage.getItem('users')
         var socket = io.connect(location.protocol + '//' + document.domain + ':'+ location.port)
         socket.on('connect', () => {
             let id = socket.io.engine.id;
             let data = {
-            //init data object
-            // helps streamline data being sent from one socket to another
-            'username': username,
-            'channel': channel
+                //init data object
+                // helps streamline data being sent from one socket to another
+                'username': username,
+                'channel': channel
             };
             console.log('connected', 'user',username,'to', channel)
             socket.emit('join_channel', data)
@@ -27,14 +29,13 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
         });
         socket.on('join', data=>{
             console.log(data)
-            console.log('users in this room =>', data.user_list)
+            channel_list = data.user_list
+            console.log('users in this room =>', channel_list)
             const li = document.createElement('li');
             li.innerHTML = `${data.username} has joined the room: ${data.room}`
             document.querySelector('#messages').append(li)
-            localStorage.setItem('users', data.user_list)
-            if (data.user_list.length){
-                printUsers(data.user_list)
-            }
+            localStorage.setItem('users', channel_list)
+            printUsers(channel_list)
 
         });
 
@@ -53,10 +54,13 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
         location.href = '/channels/view'
     }
     function printUsers(users){
+        console.log(users)
         const li = document.createElement('li')
-        users.forEach((user)=>{
+        users.forEach(function(user){
+            console.log(user)
             li.innerHTML = `${user}`
             document.querySelector('#userList').append(li)
+
         })
     }
 }

@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () =>{
     const request = new XMLHttpRequest();
     request.open('POST', '/channels/add');
-    if (localStorage.getItem('username') == null) {
+    if (localStorage.getItem('username') == null || !localStorage.getItem('username')) {
         const username = prompt('Please Enter a username')
         localStorage.setItem('username', username)
     }

@@ -38,6 +38,8 @@ channel_list = ["anthony"]
 server_data = {}
 # users in each room
 users = {}
+# init list to track users JOIN this channel
+curr_users = []
 
 
 @app.route("/", methods=["POST", "GET"])
@@ -99,9 +101,6 @@ def messages(channel):
     return render_template('messages.html', channel=channel)
 
 
-
-
-
 @socketio.on('join_channel')
 def on_join(data):
     '''connects a user to the room. 
@@ -116,25 +115,18 @@ def on_join(data):
     Returns:
         [type] -- [description]
     '''
-    # init list to track users JOIN this channel
-    curr_users = []
     socketio.username = data['username']
     channel = data['channel']
-    print(data)
-    print(socketio.username)
-    if socketio.username is not None and socketio.username not in users:
+    if socketio.username not in curr_users:
         # make function
         curr_users.append(socketio.username)
         print('added user', socketio.username, 'to ', channel)
-        emit('new_user', socketio.username)
-
     # update users
     users[channel] = curr_users
-    print('users in this room', curr_users, 'users', users)
-    room = channel
-    session[room] = curr_users
-    join_room(room)
-    dataset = {'username': socketio.username, 'room': room, 'user_list': curr_users}
+    print('users in this room', curr_users, 'users in all rooms', users)
+    session[channel] = curr_users
+    join_room(channel)
+    dataset = {'username': socketio.username, 'room': channel, 'user_list': curr_users}
     # send(dataset['username'] + ' has entered the room.', room=dataset['room'])
     emit('join', dataset, broadcast=True)
 
@@ -142,6 +134,7 @@ def on_join(data):
 @socketio.on('disconnect')
 def test_disconnect():
     print('client disconnected')
+    emit('leave')
 
 
 @socketio.on('leave')
@@ -149,8 +142,7 @@ def on_leave(data):
     username = data['username']
     channel = data['channel']
     leave_room(channel)
-    session[channel]
-    dataset = {'username': username, 'room': room}
+    dataset = {'username': username, 'room': channel}
 
 @socketio.on('submit message')
 def message(data):
