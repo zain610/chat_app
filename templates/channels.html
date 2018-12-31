@@ -16,8 +16,8 @@ Channel list
                 <th>
                     Channel Lists
                 </th>
-                {% if data['channels']%}
-                {%for channel in data['channels']%}
+                {% if channel_list%}
+                {%for channel in channel_list%}
                 <tr>
                     <td>{{channel}}</td>
                     <td><a role="button" class="btn btn-primary" onclick="enterChannel('{{channel}}')">Enter!</a></td>

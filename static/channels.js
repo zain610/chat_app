@@ -5,21 +5,6 @@ document.addEventListener('DOMContentLoaded', () =>{
     if (localStorage.getItem('username') == null) {
         const username = prompt('Please Enter a username')
         localStorage.setItem('username', username)
-        request.onload = ()=>{
-            const data = JSON.parse(request.responseText)
-            console.log(data)
-            if(data.success){
-                alert('Successfully added users to userlist')
-            }
-            else{
-                alert('Failed to add user to userlist')
-            }
-
-        }
-        const user_data = new FormData();
-        user_data.append('username', username)
-        request.send(user_data);
-        return false
     }
     
     const form = document.getElementById('channelAddForm')

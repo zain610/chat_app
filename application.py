@@ -11,19 +11,40 @@ Session(app)
 socketio = SocketIO(app, manage_session=False)
 
 channel_list = ["anthony"]
-# data like message, channel name, user etcs
-server_data = []
-# total user list
-user_list = []
+# data like message, channel name, user etcs. in dict format
+# server_data = {
+#     '121': [{
+#         'username': 'Zain',
+#         'msg': 'doiasndso'
+#     },{
+#         'username': 'Aryaan',
+#         'msg': 'adkashdbks'
+#     }],
+#     '29012':[{
+#         'username': 'Zain',
+#         'msg': 'sasd'
+#     },
+#     {
+#         'username': 'Aryaan',
+#         'msg': 'askdakbsj'
+#     }]
+# }
+#
+# users = {
+#     '121': ['aryaan', 'ain', 'ajsdiasd', 'asdiaygkdha' ],
+#     '21uhad': ['kbsfjasf', 'asdaskbjad', 'asdjbakfsa']
+# }
+# server data like messages in each channel and by which user
+server_data = {}
 # users in each room
-users = [] 
+users = {}
+
 
 @app.route("/", methods=["POST", "GET"])
 def index():
-    message = "Hello, Please Enter your display name"
-    return render_template('index.html', message = message, users =user_list)
-    
-        
+    return render_template('index.html', message=message, )
+
+
 @app.route('/channels/<action>', methods=["POST", "GET"])
 def channels(action):
     '''
@@ -44,31 +65,21 @@ def channels(action):
     '''
 
     print(action)
-    
 
     if action == "add":
         channel_name = request.form.get("channel")
-        username = request.form.get('username')
-        print("channel name", channel_name, 'username', username)
-        if username is not None and username not in user_list:
-            user_list.append(username)
-            session['user_list'] = user_list
-            return jsonify({'success': True})
+        print("channel name", channel_name)
         if channel_name is not None and channel_name not in channel_list:
             channel_list.append(channel_name)
-            session['channel_list'] = channel_list
             return jsonify({'success': True})
         else:
             return jsonify({'success': False})
-    print('all users', session.get('user_list'), 'channels',session.get('channel_list'))
-    data = {'channels': session.get('channel_list'), 'users': session.get('user_list')}
-    print('data', data)
-
-    return render_template('channels.html', action="view", data=data)
+    print('channels', channel_list)
+    return render_template('channels.html', action="view", channel_list=channel_list)
 
 
 @app.route('/messages/<channel>', methods=["POST", "GET"])
-def messages(data):
+def messages(channel):
     ''' (For now) the initial entry point for a channel/room. The user is directed
     to this when he wants to enter a channel. 
 
@@ -84,15 +95,10 @@ def messages(data):
         emits an event 'connect' -- this indicates that the username has entered the channel of channelname
         keeps track of the users who have entered this room
     '''
+    print(channel)
+    return render_template('messages.html', channel=channel)
 
-    socketio.emit('connect', data)
-    print('users in this room', users)
-    return render_template('messages.html')
 
-@socketio.on('connect')
-def connect(data):
-    users.append(data.username)
-    emit('connected')
 
 
 
@@ -102,7 +108,7 @@ def on_join(data):
     keeps track of the users in each room 
     records the chat history of the room
     stores the chat history to session so it can be retrieved for later use and keep updating new users on old news
-    
+
     
     Arguments:
         data {[type]} -- [description]
@@ -110,35 +116,41 @@ def on_join(data):
     Returns:
         [type] -- [description]
     '''
-
-    if not user_list:
-        print('j-as')
-        return redirect(url_for('channels', action='view'))
-    
+    # init list to track users JOIN this channel
+    curr_users = []
     socketio.username = data['username']
+    channel = data['channel']
+    print(data)
     print(socketio.username)
     if socketio.username is not None and socketio.username not in users:
-        users.append(socketio.username)
-    print('users in this room', users)
-    room = data['channel']
-    print('all users', user_list)
-    session[room] = user_list
+        # make function
+        curr_users.append(socketio.username)
+        print('added user', socketio.username, 'to ', channel)
+        emit('new_user', socketio.username)
+
+    # update users
+    users[channel] = curr_users
+    print('users in this room', curr_users, 'users', users)
+    room = channel
+    session[room] = curr_users
     join_room(room)
-    dataset={'username': socketio.username, 'room': room, 'user_list': session[room]}
+    dataset = {'username': socketio.username, 'room': room, 'user_list': curr_users}
+    # send(dataset['username'] + ' has entered the room.', room=dataset['room'])
     emit('join', dataset, broadcast=True)
-    
+
+
 @socketio.on('disconnect')
 def test_disconnect():
-    
     print('client disconnected')
 
-# @socketio.on('leave')
-# def on_leave(data):
-#     username = data['username']
-#     channel = data['channel']
-#     leave_room(channel)
-#     session[channel]
-#     dataset = {'username': username, 'room': room}
+
+@socketio.on('leave')
+def on_leave(data):
+    username = data['username']
+    channel = data['channel']
+    leave_room(channel)
+    session[channel]
+    dataset = {'username': username, 'room': room}
 
 @socketio.on('submit message')
 def message(data):
@@ -146,5 +158,17 @@ def message(data):
     print(server_data)
     emit('announce message', data, broadcast=True)
 
+
+@app.route('/API/channels', methods=['POST'])
+def query_channels():
+    return jsonify(channel_list), 200
+
+
+@app.route('/API/<channel_name>/users', methods=['POST'])
+def query_users(channel_name):
+    data = users[channel_name]
+    return jsonify(data), 200
+
+
 if __name__ == '__main__':
-    socketio.run(app, debug= True)
+    socketio.run(app, debug=True)

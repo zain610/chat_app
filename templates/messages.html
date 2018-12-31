@@ -1,62 +1,7 @@
 {% extends "layout.html" %}
 {%block script %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
-<script>
-    if(localStorage.getItem('username') && localStorage.getItem('channel')){
-    document.addEventListener('DOMContentLoaded', ()=>{
-        const username = localStorage.getItem('username')
-        const channel = localStorage.getItem('channel')
-        if(channel) {
-            document.getElementById('channelName').innerHTML = channel
-        }
-/*        var data = {
-            'username': username,
-            'channel': channel
-        }
-        */
-        console.log(data)
-        var socket = io.connect(location.protocol + '//' + document.domain + ':'+ location.port)
-        socket.on('connect', () =>{
-            console.log('connected')
-            socket.emit('join_channel', data)
-            
-
-
-            document.getElementById('messageInputBtn').onclick = () => {
-                const message = document.getElementById('messageInput').value;
-                console.log(message)
-                data['message'] = message
-                console.log(data)
-                socket.emit('submit message', data)        
-            };
-        });
-        socket.on('join', data=>{
-            console.log(dataset.user_list)
-            const li = document.createElement('li');
-            li.innerHTML = `${data.username} has joined the room: ${data.room}`
-            document.querySelector('#messages').append(li)
-            data.user_list.forEach((item)=>{
-                li.innerHTML = `${item}`
-                document.querySelector('#userList').append(li)
-            })
-        });
-
-        socket.on('announce message', data=>{
-            const li = document.createElement('li');
-            li.innerHTML = `Message recorded: ${data.message} by ${data.username}`;
-            document.querySelector('#messages').append(li)
-        })
-
-    });
-    function userLogout(){
-        localStorage.clear()
-        location.href = '/channels/view'
-    }
-}
-else{
-    location.href='/channels/view'
-}
-</script>
+<script type="text/javascript" src="{{ url_for('static', filename='messages.js') }}"></script>
 {%endblock%}
 {% block body%}
 <div class="container">

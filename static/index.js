@@ -6,15 +6,13 @@ Main takeaways: -> each html attribute needs to be given an unique id
 */
 document.addEventListener('DOMContentLoaded', ()=>{
 
-    if(!localStorage.getItem('display_name')) {
+    if(!localStorage.getItem('username')) {
         document.querySelector('#indexSubmitBtn').onclick = () =>{
             //stores dp in localstorage
-            const display_name = document.querySelector('#indexForm').querySelector('#display_name').value
-            localStorage.setItem('display_name', display_name)
+            const username = document.querySelector('#indexForm').querySelector('#display_name').value
+            localStorage.setItem('username', username)
         } 
     }
-    if(localStorage.getItem('display_name')){
-        location.href = 'channels/view'
-    }
+    location.href = '/channels/view'
     
 })
