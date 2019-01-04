@@ -35,7 +35,9 @@ channel_list = ["anthony"]
 #     '21uhad': ['kbsfjasf', 'asdaskbjad', 'asdjbakfsa']
 # }
 # server data like messages in each channel and by which user
-server_data = {}
+server_data = {
+    'anthony': []
+}
 # users in each room
 users = {}
 # init list to track users JOIN this channel
@@ -73,6 +75,7 @@ def channels(action):
         print("channel name", channel_name)
         if channel_name is not None and channel_name not in channel_list:
             channel_list.append(channel_name)
+            server_data[channel_name] = []
             return jsonify({'success': True})
         else:
             return jsonify({'success': False})
@@ -128,7 +131,7 @@ def on_join(data):
     join_room(channel)
     dataset = {'username': socketio.username, 'room': channel, 'user_list': curr_users}
     # send(dataset['username'] + ' has entered the room.', room=dataset['room'])
-    emit('join', dataset, broadcast=True)
+    emit('connected_user', dataset, broadcast=True)
 
 
 @socketio.on('disconnect')
@@ -143,10 +146,13 @@ def on_leave(data):
     channel = data['channel']
     leave_room(channel)
     dataset = {'username': username, 'room': channel}
+    print()
 
 @socketio.on('submit message')
 def message(data):
-    server_data.append(data)
+    (username, channel, message) = data.values()
+    print(username, channel, message)
+    server_data[data['channel']].append({ 'username': username, 'message': message })
     print(server_data)
     emit('announce message', data, broadcast=True)
 

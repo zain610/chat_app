@@ -27,7 +27,7 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
                 socket.emit('submit message', data)
             };
         });
-        socket.on('join', data=>{
+        socket.on('connected_user', data=>{
             console.log(data)
             channel_list = data.user_list
             console.log('users in this room =>', channel_list)
@@ -35,7 +35,7 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
             li.innerHTML = `${data.username} has joined the room: ${data.room}`
             document.querySelector('#messages').append(li)
             localStorage.setItem('users', channel_list)
-            printUsers(channel_list)
+            printUsers()
 
         });
 
@@ -47,21 +47,22 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
         socket.on('new_user', username=>{
             console.log(username + '  added successfully')
         })
+        socket.on('user_leave', data=>{
+            console.log(data)
+            channel
+        })
 
     });
     function userLogout(){
         localStorage.clear()
         location.href = '/channels/view'
     }
-    function printUsers(users){
-        console.log(users)
-        const li = document.createElement('li')
-        users.forEach(function(user){
-            console.log(user)
-            li.innerHTML = `${user}`
-            document.querySelector('#userList').append(li)
 
-        })
+    function printUsers() {
+        users = localStorage.getItem('users')
+        const li = document.createElement('li')
+        li.innerText = users
+        document.querySelector('#userList').innerHTML = li.textContent
     }
 }
 else{
