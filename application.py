@@ -46,7 +46,7 @@ curr_users = []
 
 @app.route("/", methods=["POST", "GET"])
 def index():
-    return render_template('index.html', message=message, )
+    return render_template('index.html', message=message )
 
 
 @app.route('/channels/<action>', methods=["POST", "GET"])
@@ -150,6 +150,7 @@ def on_leave(data):
 
 @socketio.on('submit message')
 def message(data):
+    print(data)
     (username, channel, message) = data.values()
     print(username, channel, message)
     server_data[data['channel']].append({ 'username': username, 'message': message })
