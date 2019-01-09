@@ -1,8 +1,6 @@
-import * as moment from 'src/moment.js';
 if(localStorage.getItem('username') && localStorage.getItem('channel')){
     document.addEventListener('DOMContentLoaded', () => {
         // get username and channel of user
-        console.log(moment())
         let channel_list = []
         const username = localStorage.getItem('username');
         const channel = localStorage.getItem('channel');
@@ -19,7 +17,6 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
             socket.emit('join_channel', data)
 
 
-
             document.getElementById('messageInputBtn').onclick = () => {
                 const message = document.getElementById('messageInput').value;
 
@@ -29,62 +26,59 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
                 socket.emit('submit message', data)
                 document.getElementById('messageInput').value = "";
             };
-        });
-        socket.on('connected_user', data=>{
-            console.log(data)
-            channel_list = data.user_list
-            console.log('users in this room =>', channel_list)
-            const li = document.createElement('li');
-            li.innerHTML = `${data.username} has joined the room: ${data.room}`
-            document.querySelector('#messages').append(li)
-            localStorage.setItem('users', channel_list)
-            printUsers()
+            socket.on('connected_user', data=>{
+                channel_list = data.user_list;
+                const savedMessages = data.saved_messages;
+                console.log('users in this room =>', channel_list, 'saved messages=>', savedMessages);
+                const li = document.createElement('li');
+                li.innerHTML = `${data.username} has joined the room: ${data.room}`;
+                if (savedMessages) {
+                    savedMessages.forEach((message)=>{
+                        printMessages(message)
+                    })
+                }
+                document.querySelector('#messages').append(li);
+                localStorage.setItem('users', channel_list);
+                printUsers(channel_list)
+            });
+
+            socket.on('announce message', data=>{
+                printMessages(data)
+            })
+
+
+            socket.on('new_user', username=>{
+                console.log(username + '  added successfully')
+            })
+            socket.on('user_leave', data=>{
+                console.log(data)
+                channel
+            })
 
         });
+        // noinspection JSAnnotator
+        function userLogout(){
+            localStorage.clear()
+            location.href = '/channels/view'
+        }
 
-        socket.on('announce message', data=>{
+
+        // noinspection JSAnnotator
+        // This type of arrow function is called anonymous function
+        let printUsers = (users) => {
+            const li = document.createElement('li')
+            li.innerText = users
+            document.querySelector('#userList').innerHTML = li.textContent
+        };
+        let printMessages = (data) => {
             const li = document.createElement('li');
             li.innerHTML = `Message recorded: ${data.message} by ${data.username}`;
             document.querySelector('#messages').append(li)
-        })
-        socket.on('new_user', username=>{
-            console.log(username + '  added successfully')
-        })
-        socket.on('user_leave', data=>{
-            console.log(data)
-            channel
-        })
-
+        }
     });
-    // noinspection JSAnnotator
-    function userLogout(){
-        localStorage.clear()
-        location.href = '/channels/view'
-    }
-
-    // noinspection JSAnnotator
-    function printUsers() {
-        let users = localStorage.getItem('users')
-        const li = document.createElement('li')
-        li.innerText = users
-        document.querySelector('#userList').innerHTML = li.textContent
-    }
 }
 else{
     location.href='/channels/view'
 }
 
 
-/**
- To-Do:
- 1. Storing chat history.
-  -  store all messages under channel name in the server. when a new user joins the channel, he is able to read all messages
-  - store only messages and channel
- 2. Timestamps:
- - import moment.js and use it to create time stamps for each message
-  - add time stamp next to each message
- 3. USer disconnects.
-  - When user closes tab, disconnect
-  - this means that the user is removed from active users list and
-
- */

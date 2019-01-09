@@ -106,7 +106,8 @@ def messages(channel):
 
 @socketio.on('join_channel')
 def on_join(data):
-    '''connects a user to the room. 
+    '''
+    connects a user to the room.
     keeps track of the users in each room 
     records the chat history of the room
     stores the chat history to session so it can be retrieved for later use and keep updating new users on old news
@@ -129,7 +130,13 @@ def on_join(data):
     print('users in this room', curr_users, 'users in all rooms', users)
     session[channel] = curr_users
     join_room(channel)
-    dataset = {'username': socketio.username, 'room': channel, 'user_list': curr_users}
+    print(server_data[channel])
+    dataset = {
+        'username': socketio.username,
+        'room': channel,
+        'user_list': curr_users,
+        'saved_messages': server_data[channel]
+    }
     # send(dataset['username'] + ' has entered the room.', room=dataset['room'])
     emit('connected_user', dataset, broadcast=True)
 
@@ -145,16 +152,15 @@ def on_leave(data):
     username = data['username']
     channel = data['channel']
     leave_room(channel)
-    dataset = {'username': username, 'room': channel}
-    print()
 
 @socketio.on('submit message')
 def message(data):
-    print(data)
+
+    print('data=>', data)
     (username, channel, message) = data.values()
     print(username, channel, message)
     server_data[data['channel']].append({ 'username': username, 'message': message })
-    print(server_data)
+    print(server_data[channel])
     emit('announce message', data, broadcast=True)
 
 
@@ -171,3 +177,19 @@ def query_users(channel_name):
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
+
+
+'''
+To-Do:
+ 1. Storing chat history.
+  -  store all messages under channel name in the server. when a new user joins the channel, he is able to read all messages
+  - store only messages and channel
+ 2. Timestamps:
+ - import moment.js and use it to create time stamps for each message
+  - add time stamp next to each message
+ 3. USer disconnects.
+  - When user closes tab, disconnect
+  - this means that the user is removed from active users list and
+
+ */
+'''
