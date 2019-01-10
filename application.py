@@ -174,7 +174,10 @@ def query_users(channel_name):
     data = users[channel_name]
     return jsonify(data), 200
 
-
+@app.route('/API/<channel_name>/messages', methods=['POST'])
+def query_msg(channel_name):
+    data = server_data[channel_name]
+    return jsonify(data), 200
 if __name__ == '__main__':
     socketio.run(app, debug=True)
 

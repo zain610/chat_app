@@ -1,4 +1,4 @@
-if(localStorage.getItem('username') && localStorage.getItem('channel')){
+if(localStorage.getItem('username') && localStorage.getItem('channel') && localStorage.getItem('channel')!=null){
     document.addEventListener('DOMContentLoaded', () => {
         // get username and channel of user
         let channel_list = []
@@ -13,6 +13,7 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
                 'username': username,
                 'channel': channel,
             };
+            document.getElementById('channelName').innerText = channel
             console.log('connected', 'user',username,'to', channel)
             socket.emit('join_channel', data)
 
@@ -56,12 +57,17 @@ if(localStorage.getItem('username') && localStorage.getItem('channel')){
             })
 
         });
-        // noinspection JSAnnotator
-        function userLogout(){
+
+        document.getElementById('userLogout').onclick = () => {
             localStorage.clear()
             location.href = '/channels/view'
-        }
+        };
 
+        document.getElementById('leaveChannel').onclick = ()=>{
+            socket.emit('leave')
+            localStorage.removeItem('channel')
+            location.href = '/channels/view'
+        };
 
         // noinspection JSAnnotator
         // This type of arrow function is called anonymous function
