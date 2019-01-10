@@ -1,12 +1,18 @@
 
 document.addEventListener('DOMContentLoaded', () =>{
+
+    document.getElementById('userLogout').onclick = () => {
+        // logging out user.
+        localStorage.removeItem('username')
+        location.reload()
+    };
     const request = new XMLHttpRequest();
     request.open('POST', '/channels/add');
     if (localStorage.getItem('username') == null || !localStorage.getItem('username')) {
         const username = prompt('Please Enter a username')
         localStorage.setItem('username', username)
     }
-    
+
     const form = document.getElementById('channelAddForm')
     form.addEventListener('submit', ()=>{
         const channel = form.querySelector('#channelsAddName').value
@@ -15,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () =>{
         channel_data.append('channel', channel );
         // Send request
         request.send(channel_data)
-        
+
         //Callback function for when the request completes
         request.onload = () =>{
             // get json data
@@ -28,11 +34,11 @@ document.addEventListener('DOMContentLoaded', () =>{
             else{
                 const contents = "there was an error, please try again!"
                 alert(contents)
-            }    
-        location.reload()
-        return false;
+            }
+            location.reload()
+            return false;
         }
-       
+
     })
 })
 function enterChannel(name) {

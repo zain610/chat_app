@@ -112,30 +112,33 @@ def on_join(data):
     records the chat history of the room
     stores the chat history to session so it can be retrieved for later use and keep updating new users on old news
 
-    
+
+    users[channel] is basically. curr_users.
     Arguments:
         data {[type]} -- [description]
     
     Returns:
         [type] -- [description]
     '''
+
     socketio.username = data['username']
-    channel = data['channel']
+    # this helps to identify the socket that connects / disconnects.
+    socketio.channel = data['channel']
     if socketio.username not in curr_users:
         # make function
         curr_users.append(socketio.username)
-        print('added user', socketio.username, 'to ', channel)
+        print('added user', socketio.username, 'to ', socketio.channel)
     # update users
-    users[channel] = curr_users
+    users[socketio.channel] = curr_users
     print('users in this room', curr_users, 'users in all rooms', users)
-    session[channel] = curr_users
-    join_room(channel)
-    print(server_data[channel])
+    session[socketio.channel] = curr_users
+    join_room(socketio.channel)
+    print(server_data[socketio.channel])
     dataset = {
         'username': socketio.username,
-        'room': channel,
+        'room': socketio.channel,
         'user_list': curr_users,
-        'saved_messages': server_data[channel]
+        'saved_messages': server_data[socketio.channel]
     }
     # send(dataset['username'] + ' has entered the room.', room=dataset['room'])
     emit('connected_user', dataset, broadcast=True)
@@ -143,15 +146,21 @@ def on_join(data):
 
 @socketio.on('disconnect')
 def test_disconnect():
-    print('client disconnected')
-    emit('leave')
+    '''
+    This fn is to remove the user from the channel. This is done by:
+    1. remove users from curr_users of the channel
 
+    Does removing the user from curr_user automatically remove it from users dict?
+    :return:
 
-@socketio.on('leave')
-def on_leave(data):
-    username = data['username']
-    channel = data['channel']
-    leave_room(channel)
+    '''
+    print('client disconnected', socketio.username)
+    for user in curr_users:
+        if user == socketio.username:
+            curr_users.remove(user)
+
+    return url_for('channels', action='view')
+
 
 @socketio.on('submit message')
 def message(data):

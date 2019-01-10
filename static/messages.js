@@ -47,26 +47,21 @@ if(localStorage.getItem('username') && localStorage.getItem('channel') && localS
                 printMessages(data)
             })
 
-
             socket.on('new_user', username=>{
                 console.log(username + '  added successfully')
             })
-            socket.on('user_leave', data=>{
-                console.log(data)
-                channel
-            })
-
         });
 
         document.getElementById('userLogout').onclick = () => {
+            // remove username and leave channel
             localStorage.clear()
             location.href = '/channels/view'
         };
 
         document.getElementById('leaveChannel').onclick = ()=>{
-            socket.emit('leave')
+            // leave channel
             localStorage.removeItem('channel')
-            location.href = '/channels/view'
+            socket.emit('disconnect')
         };
 
         // noinspection JSAnnotator
