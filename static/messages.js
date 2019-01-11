@@ -5,7 +5,7 @@ if(localStorage.getItem('username') && localStorage.getItem('channel') && localS
         const username = localStorage.getItem('username');
         const channel = localStorage.getItem('channel');
         let users = localStorage.getItem('users')
-        var socket = io.connect()
+        var socket = io('://localhost:3000', {transports: ['websocket'] });
         socket.on('connect', () => {
             let data = {
                 //init data object
