@@ -6,7 +6,7 @@ Install Requirements
 ```
 pip install -r requirements.txt
 ```
-Run this once
+Running the application
 ```
 export FLASK_APP=application.py
 flask run
